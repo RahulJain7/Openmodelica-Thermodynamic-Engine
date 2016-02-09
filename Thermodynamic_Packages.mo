@@ -170,23 +170,7 @@ for i in 1:NOC loop
       end if;
     end for;
   end for;  
- end //  Real x[NOC] (each start = 0.5, each min = 0, each max = 1);
-//  Real fil[NOC](each start = 1);
-for;
-    end //    aaml := 0;
-    //     aaml := aaml + x[j] * x[k] * aa[j,k];
-    //    aml := aml + aaml;
-//    bml := bml + x[l] * b[l];
-    //  Al := aml * P / (R ^ 2 * T ^ 2);
-    //  Bl := bml * P / (R * T);
-//  Polyl[1] := 1;
-    //  Polyl[2] := -(1 - Bl);
-    //  Polyl[3] := Al - 3 * Bl ^ 2 - 2 * Bl;
-    //  Polyl[4] := -(Al * Bl - Bl ^ 2 - Bl^3);
-    //  Zl := Modelica.Math.Vectors.Utilities.roots(Polyl);
-//    zl[i] := Zl[i, 1];
-    //  ZL := zl[3];
-//      sl[i] := sl[i] + x[j] * aa[i,j];
-//    log(fil[i]) = b[i] / bml * (ZL - 1) - log(ZL - Bl) - Al / (2 * 2 ^ 0.5 * Bl) * (2*sl[i] / aml - b[i] / bml) * log((ZL + 2.414 * Bl) / (ZL - 0.414 * Bl));
-BIPPR;
+ end for;
+ end  BIPPR;//  Real x[NOC] (each start = 0.5, each min = 0, each max = 1);
+
 end Thermodynamic_Packages;

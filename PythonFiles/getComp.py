@@ -78,7 +78,17 @@ for comp in compound:
      HOC = comp.getElementsByTagName("HeatOfCombustion")[0].getAttribute("value")
    except IndexError: 
      HOC = "0"
-   try:   
+   try:
+     UniquacR = comp.getElementsByTagName("UniquacR")[0].getAttribute("value")
+   except IndexError:
+     UniquacR = "0"
+   try:
+     UniquacQ = comp.getElementsByTagName("UniquacQ")[0].getAttribute("value")
+   except IndexError:
+     UniquacQ = "0"
+
+
+   try:
      LiqDen = comp.getElementsByTagName("LiquidDensity")[0]
      LiqDenEqn = LiqDen.getElementsByTagName("eqno")[0].getAttribute("value")
      A=LiqDen.getElementsByTagName("A")[0].getAttribute("value")
@@ -192,7 +202,7 @@ for comp in compound:
      VCpC = "0"
      VCpD = "0"
      VCpE = "0"
-   f = open('File1.txt','a')
+   f = open('File3.txt','a')
    f.write('model '+CompName)
    f.write('\n')
    f.write('extends General_Properties(')
@@ -247,7 +257,11 @@ for comp in compound:
    f.write('\n')   
    f.write('HOV = {'+HOVEqn+","+HOVA+","+HOVB+","+HOVC+","+HOVD+","+HOVE+'},')    
    f.write('\n')  
-   f.write('VapCp = {'+VapCpEqn+","+VCpA+","+VCpB+","+VCpC+","+VCpD+","+VCpE+'});')    
+   f.write('VapCp = {'+VapCpEqn+","+VCpA+","+VCpB+","+VCpC+","+VCpD+","+VCpE+'},')    
+   f.write('\n')
+   f.write('UniquacR = '+ UniquacR + ',')
+   f.write('\n')
+   f.write('UniquacQ = '+ UniquacQ + ');')
    f.write('\n')
    f.write('end '+CompName+';')
    f.write('\n')

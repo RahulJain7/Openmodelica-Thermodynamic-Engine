@@ -48,15 +48,15 @@ end BIPNRTL;
 model NRTL
   
   constant Real R = 1.9872;
-  parameter Integer NOC;
-  parameter Chemsep_Database.General_Properties Comp[NOC];
-  parameter Real BIPS[NOC,NOC,2] =  BIPNRTL(NOC,Comp.name);
+  //  parameter Integer NOC;
+    //   parameter Chemsep_Database.General_Properties Comp[NOC];
+    parameter Real BIPS[NOC,NOC,2] =  BIPNRTL(NOC,Comp.name);
   parameter Real A[NOC,NOC] = BIPS[:,:,1];
   parameter Real alpha[NOC,NOC] = BIPS[:,:,2];
-  Real P, T(start = 350, min = 273);
-  Real x[NOC](each start = 0.5, each min = 0.001, each max = 1);
-  Real y[NOC](each start = 0.5, each min = 0, each max = 1);
-  Real ta[NOC,NOC];
+  //  Real P, T(start = 350, min = 273);
+    //  Real x[NOC](each start = 0.5, each min = 0.001, each max = 1);
+    //  Real y[NOC](each start = 0.5, each min = 0, each max = 1);
+    Real ta[NOC,NOC];
   Real G[NOC,  NOC], sum1[NOC], sum2[NOC];
   Real gamma[NOC](each start = 1) ;
   algorithm
@@ -229,6 +229,7 @@ for i in 1:NOC loop
   y[:] = K[:] .* x[:];
   y[:] * beta + x[:] * (1 - beta) = z[:];
   end UNIQUAC_test;
+  
   function BIP_UNIQUAC
   input Integer NOC;
   input String Comp[NOC];
@@ -263,6 +264,7 @@ for i in 1:NOC loop
   end for;
   end for;
   end BIP_UNIQUAC;
+  
   model bubblepnt
   //parameter Chemsep_Database.Methanol methanol;
     parameter Chemsep_Database.Ethanol ethanol;
@@ -281,6 +283,7 @@ for i in 1:NOC loop
   y[1] = 0;
   y[2] = 0;
   end bubblepnt;
+  
   model DewPnt
   //parameter Chemsep_Database.Methanol methanol;
     parameter Chemsep_Database.Ethanol ethanol;
@@ -300,4 +303,109 @@ for i in 1:NOC loop
   x[2] = 1 - x[1];
   x[2] = y[2] / K[2];
   end DewPnt;
+  
+  function BIPSRK
+  input Integer NOC;
+  input String Comp[NOC];
+  output Real value[NOC, NOC];
+  constant String underscore = "_";
+  String c[NOC, NOC];
+  String d[NOC, NOC];
+  constant String Comp1_Comp2[39] = {"Methanol_Water", "Methane_Ethane", "Methane_Propane", "Methane_Nbutane", "Methane_Npentane", "Methane_Nhexane", "Methane_Nheptane", "Methane_M-xylene", "Methane_Noctane", "Methane_Nnonane", "Ethane_Propane", "Ethane_Nbutane", "Ethane_Npentane", "Ethane_Benzene", "Ethane_Cyclohexane", "Ethane_Nhexane", "Ethane_Nheptane", "Ethane_Noctane", "Propane_Ethanol", "Propane_Nbutane", "Propane_Npentane", "Propane_Benzene", "Propane_Nhexane", "Propane_Nheptane", "Propane_Noctane", "Nbutane_Npentane", "Nbutane_Nhexane", "Nbutane_Nheptane", "Nbutane_Noctane", "Npentane_Benzene", "Npentane_Cyclohexane", "Npentane_Nheptane", "Npentane_Noctane", "Benzene_Nheptane", "Benzene_Noctane", "Cyclohexane_Benzene", "Nhexane_Benzene", "Nhexane_Cyclohexane", "Nhexane_Nheptane"};
+  constant Real BI_Values[39] = {-0.0789, -0.0089, 0.018, 0.0215, 0.018, 0.0378, 0.0274, 0.09, 0.0448, 0.0448, -0.0022, 0.0052, 0.0056, 0.0278, 0.0122, -0.0433, 0.0041, 0.017, 0.0256, 0, 0.0233, 0.02, -0.0022, 0.0044, 0.0074, 0.0204, -0.0111, -0.0004, 0.0044, 0.0244, 0.0041, 0.0019, -0.0022, 0.0048, 0.007, 0.0322, 0.0156, -0.0011, -0.0011};
+  algorithm
+  for i in 1:NOC loop
+  for j in 1:NOC loop
+  value[i, j] := 0;
+  end for;
+  end for;
+  for i in 1:NOC loop
+  for j in 1:NOC loop
+  c[i, j] := Comp[i] + underscore + Comp[j];
+  d[i, j] := Comp[j] + underscore + Comp[i];
+  for k in 1:39 loop
+  if c[i, j] == Comp1_Comp2[k] or d[i, j] == Comp1_Comp2[k] then
+  value[i, j] := BI_Values[k];
+  end if;
+  end for;
+  end for;
+  end for;
+  end BIPSRK;
+  
+  model SRK
+  constant Real R = 8.314;
+  parameter Integer NOC;
+  parameter Chemsep_Database.General_Properties Comp[NOC];
+  parameter Real KSRK[NOC, NOC] = BIPSRK(NOC, Comp.name);
+  Real Tr[NOC],  aa[NOC, NOC];
+  Real fiv[NOC](each start = 1);
+ Real Zv[3, 2], ZV, zv[3] ;
+  Real a[NOC], b[NOC], amv, aamv, bmv, Av, Bv, Polyv[4];
+  Real fil[NOC](each start = 1);
+  Real Zl[3, 2], ZL, zl[3] ;
+  Real aml, aaml, bml, Al, Bl, Polyl[4];
+  algorithm
+  for i in 1:NOC loop
+  Tr[i] := T / Comp[i].Tc;
+  a[i] := (1 + (0.48 + 1.574 * Comp[i].AF - 0.176 * Comp[i].AF ^ 2) * (1 - Tr[i] ^ 0.5)) ^ 2 * (0.42747 * R ^ 2 * Comp[i].Tc ^ 2) / Comp[i].Pc;
+  b[i] := 0.08664 * (R * Comp[i].Tc) / Comp[i].Pc;
+  end for;
+  for j in 1:NOC loop
+  aamv := 0;
+  aaml := 0;
+      for k in 1:NOC loop
+  aa[j, k] := (a[j] * a[k]) ^ 0.5 * (1 - KSRK[j, k]);
+  aamv := aamv + y[j] * y[k] * aa[j, k];
+  aaml := aaml + x[j] * x[k] * aa[j, k];
+      end for;
+  amv := amv + aamv;
+  aml := aml + aaml;
+    end for;
+  bmv := sum(y[:] .* b[:]);
+  bml := sum(x[:] .* b[:]);
+  Av := amv * P / (R ^ 2 * T ^ 2);
+  Bv := bmv * P / (R * T);
+  Al := aml * P / (R ^ 2 * T ^ 2);
+  Bl := bml * P / (R * T);
+    Polyv[1] := 1;
+  Polyv[2] := -1;
+  Polyv[3] := Av - Bv - Bv ^ 2;
+  Polyv[4] := -Av * Bv;
+  Polyl[1] := 1;
+  Polyl[2] := -1;
+  Polyl[3] := Al - Bl - Bl ^ 2;
+  Polyl[4] := -Al * Bl;
+  Zl := Modelica.Math.Vectors.Utilities.roots(Polyl);
+  Zv := Modelica.Math.Vectors.Utilities.roots(Polyv);
+  for i in 1:3 loop
+  zv[i] := Zv[i, 1];
+  zl[i] := Zl[i, 1];
+    end for;
+  ZV := max(zv);
+  ZL := zl[2];
+    for i in 1:NOC loop
+  fiv[i] := exp(b[i] / bmv * (ZV - 1) - log(ZV - Bv) - Av / Bv * (sum(y[:] .* aa[:, i]) / amv - b[i] / bmv) * log((ZV + Bv) / ZV));
+  fil[i] := exp(b[i] / bml * (ZL - 1) - log(ZL - Bl) - Al / Bl * (sum(x[:] .* aa[:, i]) / aml - b[i] / bml) * log((ZL + Bl) / ZL));
+  end for;
+  end SRK;
+  
+  model SRK_test
+  parameter Chemsep_Database.Propane propane;
+  parameter Chemsep_Database.Benzene benzene;
+  parameter Real z[2] = {0.5, 0.5};
+  extends SRK(NOC = 2, Comp = {propane, benzene});
+  parameter Real P = 101325, T = 303;
+  Real x[2](each start = 0.5, each min = 0, each max = 1);
+  Real y[2](each start = 0.5, each min = 0, each max = 1);
+  Real beta(start = 0.5, min = 0, max = 1), K[2](each start = 1, each min = 0), Psat[2];
+  algorithm
+  for i in 1:2 loop
+  Psat[i] := Thermodynamic_Functions.Psat(Comp[i].VP, T);
+  end for;
+  equation
+  sum(x[:]) - sum(y[:]) = 0;
+  K[:] = fil[:] .* Psat[:] ./ (P .* fiv[:]);
+  y[:] = K[:] .* x[:];
+  y[:] * beta + x[:] * (1 - beta) = z[:];
+  end SRK_test;
 end Thermodynamic_Packages;

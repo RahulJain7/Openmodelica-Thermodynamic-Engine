@@ -86,6 +86,10 @@ for comp in compound:
      UniquacQ = comp.getElementsByTagName("UniquacQ")[0].getAttribute("value")
    except IndexError:
      UniquacQ = "0"
+   try:
+     RacketParam = comp.getElementsByTagName("RacketParameter")[0].getAttribute("value")
+   except IndexError:
+     RacketParam = "0"
 
 
    try:
@@ -202,7 +206,97 @@ for comp in compound:
      VCpC = "0"
      VCpD = "0"
      VCpE = "0"
-   f = open('File3.txt','a')
+
+   try:
+      LiqVis = comp.getElementsByTagName("LiquidViscosity")[0]
+      LiqVisEqn = LiqVis.getElementsByTagName("eqno")[0].getAttribute("value")
+      LiqVisA=LiqVis.getElementsByTagName("A")[0].getAttribute("value")
+      LiqVisB=LiqVis.getElementsByTagName("B")[0].getAttribute("value")
+      LiqVisC=LiqVis.getElementsByTagName("C")[0].getAttribute("value")
+      try:
+          LiqVisD=LiqVis.getElementsByTagName("D")[0].getAttribute("value")
+      except IndexError:
+          LiqVisD = "0"
+      try:
+          LiqVisE=LiqVis.getElementsByTagName("E")[0].getAttribute("value")
+      except IndexError:
+          LiqVisE = "0"
+   except IndexError:
+     LiqVisEqn = "0"
+     LiqVisA = "0"
+     LiqVisB = "0"
+     LiqVisC = "0"
+     LiqVisD = "0"
+     LiqVisE = "0"
+
+   try:
+      VapVis = comp.getElementsByTagName("VaporViscosity")[0]
+      VapVisEqn = VapVis.getElementsByTagName("eqno")[0].getAttribute("value")
+      VapVisA=VapVis.getElementsByTagName("A")[0].getAttribute("value")
+      VapVisB=VapVis.getElementsByTagName("B")[0].getAttribute("value")
+      VapVisC=VapVis.getElementsByTagName("C")[0].getAttribute("value")
+      try:
+          VapVisD=VapVis.getElementsByTagName("D")[0].getAttribute("value")
+      except IndexError:
+          VapVisD = "0"
+      try:
+          VapVisE=VapVis.getElementsByTagName("E")[0].getAttribute("value")
+      except IndexError:
+          VapVisE = "0"
+   except IndexError:
+     VapVisEqn = "0"
+     VapVisA = "0"
+     VapVisB = "0"
+     VapVisC = "0"
+     VapVisD = "0"
+     VapVisE = "0"
+
+
+   try:
+      LiqK = comp.getElementsByTagName("LiquidThermalConductivity")[0]
+      LiqKEqn = LiqK.getElementsByTagName("eqno")[0].getAttribute("value")
+      LiqKA=LiqK.getElementsByTagName("A")[0].getAttribute("value")
+      LiqKB=LiqK.getElementsByTagName("B")[0].getAttribute("value")
+      LiqKC=LiqK.getElementsByTagName("C")[0].getAttribute("value")
+      try:
+          LiqKD=LiqK.getElementsByTagName("D")[0].getAttribute("value")
+      except IndexError:
+          LiqKD = "0"
+      try:
+          LiqKE=LiqK.getElementsByTagName("E")[0].getAttribute("value")
+      except IndexError:
+          LiqKE = "0"
+   except IndexError:
+     LiqKEqn = "0"
+     LiqKA = "0"
+     LiqKB = "0"
+     LiqKC = "0"
+     LiqKD = "0"
+     LiqKE = "0"
+
+   try:
+      VapK = comp.getElementsByTagName("VaporThermalConductivity")[0]
+      VapKEqn = VapK.getElementsByTagName("eqno")[0].getAttribute("value")
+      VapKA=VapK.getElementsByTagName("A")[0].getAttribute("value")
+      VapKB=VapK.getElementsByTagName("B")[0].getAttribute("value")
+      VapKC=VapK.getElementsByTagName("C")[0].getAttribute("value")
+      try:
+          VapKD=VapK.getElementsByTagName("D")[0].getAttribute("value")
+      except IndexError:
+          VapKD = "0"
+      try:
+          VapKE=VapK.getElementsByTagName("E")[0].getAttribute("value")
+      except IndexError:
+          VapKE = "0"
+   except IndexError:
+     VapKEqn = "0"
+     VapKA = "0"
+     VapKB = "0"
+     VapKC = "0"
+     VapKD = "0"
+     VapKE = "0"
+
+   f = open('File5.txt','a')
    f.write('model '+CompName)
    f.write('\n')
    f.write('extends General_Properties(')
@@ -258,6 +352,16 @@ for comp in compound:
    f.write('HOV = {'+HOVEqn+","+HOVA+","+HOVB+","+HOVC+","+HOVD+","+HOVE+'},')    
    f.write('\n')  
    f.write('VapCp = {'+VapCpEqn+","+VCpA+","+VCpB+","+VCpC+","+VCpD+","+VCpE+'},')    
+   f.write('\n')
+   f.write('LiqVis = {'+LiqVisEqn+","+LiqVisA+","+LiqVisB+","+LiqVisC+","+LiqVisD+","+LiqVisE+'},')
+   f.write('\n')
+   f.write('VapVis = {'+VapVisEqn+","+VapVisA+","+VapVisB+","+VapVisC+","+VapVisD+","+VapVisE+'},')
+   f.write('\n')
+   f.write('LiqK = {'+LiqKEqn+","+LiqKA+","+LiqKB+","+LiqKC+","+LiqKD+","+LiqKE+'},')
+   f.write('\n')
+   f.write('VapK = {'+VapKEqn+","+VapKA+","+VapKB+","+VapKC+","+VapKD+","+VapKE+'},')
+   f.write('\n')
+   f.write('Racketparam = '+RacketParam +',')
    f.write('\n')
    f.write('UniquacR = '+ UniquacR + ',')
    f.write('\n')
